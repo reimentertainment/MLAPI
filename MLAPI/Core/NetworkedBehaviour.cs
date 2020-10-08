@@ -91,6 +91,18 @@ namespace MLAPI
         /// </summary>
         protected ulong ExecutingRpcSender => executingRpcSender;
         internal ulong executingRpcSender;
+
+        /// <summary>
+        /// Gets the type of RPC that is being invoked right now by the messaging system
+        /// </summary>
+        protected RpcInvocationState CurrentRpcState => currentRpcState;
+        internal RpcInvocationState currentRpcState = RpcInvocationState.None;
+
+        /// <summary>
+        /// Gets whether or not we are executing an RPC. Should return true while inside methods that are being called by the messaging system
+        /// </summary>
+        protected bool IsInvokingRpc => CurrentRpcState == RpcInvocationState.Client || CurrentRpcState == RpcInvocationState.Server;
+
         /// <summary>
         /// Gets the NetworkedObject that owns this NetworkedBehaviour instance
         /// </summary>
@@ -1037,7 +1049,16 @@ namespace MLAPI
         {
             if (rpcDefinition.serverMethods.ContainsKey(hash))
             {
-                return rpcDefinition.serverMethods[hash].Invoke(this, senderClientId, stream);
+                try
+                {
+                    currentRpcState = RpcInvocationState.Server;
+                    return rpcDefinition.serverMethods[hash].Invoke(this, senderClientId, stream);
+                }
+                finally
+                {
+                    currentRpcState = RpcInvocationState.None;
+                }
+                
             }
 
             return null;
@@ -1047,7 +1068,15 @@ namespace MLAPI
         {
             if (rpcDefinition.clientMethods.ContainsKey(hash))
             {
-                return rpcDefinition.clientMethods[hash].Invoke(this, senderClientId, stream);
+                try
+                {
+                    currentRpcState = RpcInvocationState.Client;
+                    return rpcDefinition.clientMethods[hash].Invoke(this, senderClientId, stream);
+                }
+                finally
+                {
+                    currentRpcState = RpcInvocationState.None;
+                }
             }
 
             return null;

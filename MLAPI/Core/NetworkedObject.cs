@@ -615,5 +615,36 @@ namespace MLAPI
             }
             return childNetworkedBehaviours[index];
         }
+
+        public void SpawnServerOnly(Stream spawnPayload = null, bool destroyWithScene = false)
+        {
+            if (!NetworkingManager.Singleton.IsListening)
+            {
+                throw new NotListeningException("NetworkingManager isn't listening, start a server, client or host before spawning objects.");
+            }
+
+            if (spawnPayload != null)
+                spawnPayload.Position = 0;
+
+            SpawnManager.SpawnNetworkedObjectLocally(this, SpawnManager.GetNetworkObjectId(), false, false, null, spawnPayload, spawnPayload != null, spawnPayload == null ? 0 : (int)spawnPayload.Length, false, destroyWithScene);
+
+            /*for (int i = 0; i < NetworkingManager.Singleton.ConnectedClientsList.Count; i++)
+            {
+                if (observers.Contains(NetworkingManager.Singleton.ConnectedClientsList[i].ClientId))
+                {
+                    SpawnManager.SendSpawnCallForObject(NetworkingManager.Singleton.ConnectedClientsList[i].ClientId, this, spawnPayload);
+                }
+            }*/
+        }
+
+        public void Link(ulong networkId)
+        {
+            //this.NetworkId = networkId;
+
+            SpawnManager.SpawnNetworkedObjectLocally(this, networkId, false, false, 0, null, false,  0, false, false);
+
+            /*if (NetworkingManager.Singleton.IsServer)
+                SpawnManager.SpawnedObjects[NetworkId] = this;*/
+        }
     }
 }

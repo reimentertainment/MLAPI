@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 using MLAPI.Configuration;
 using MLAPI.Exceptions;
 using MLAPI.Hashing;
@@ -35,7 +36,7 @@ namespace MLAPI.Spawning
         /// </summary>
         /// <param name="position">The position to spawn the object at</param>
         /// <param name="rotation">The rotation to spawn the object with</param>
-        public delegate NetworkedObject SpawnHandlerDelegate(Vector3 position, Quaternion rotation);
+        public delegate Task<NetworkedObject> SpawnHandlerDelegate(Vector3 position, Quaternion rotation);
         /// <summary>
         /// The delegate used when destroying networked objects
         /// </summary>
@@ -237,7 +238,7 @@ namespace MLAPI.Spawning
         }
 
         // Only ran on Client
-        internal static NetworkedObject CreateLocalNetworkedObject(bool softCreate, ulong instanceId, ulong prefabHash, ulong? parentNetworkId, Vector3? position, Quaternion? rotation)
+        internal static async Task<NetworkedObject> CreateLocalNetworkedObject(bool softCreate, ulong instanceId, ulong prefabHash, ulong? parentNetworkId, Vector3? position, Quaternion? rotation)
         {
             NetworkedObject parent = null;
 
@@ -255,7 +256,7 @@ namespace MLAPI.Spawning
                 // Create the object
                 if (customSpawnHandlers.ContainsKey(prefabHash))
                 {
-                    NetworkedObject networkedObject = customSpawnHandlers[prefabHash](position.GetValueOrDefault(Vector3.zero), rotation.GetValueOrDefault(Quaternion.identity));
+                    NetworkedObject networkedObject = await customSpawnHandlers[prefabHash](position.GetValueOrDefault(Vector3.zero), rotation.GetValueOrDefault(Quaternion.identity));
 
                     if (parent != null)
                     {

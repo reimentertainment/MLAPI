@@ -26,6 +26,7 @@ using static MLAPI.Messaging.CustomMessagingManager;
 using MLAPI.Exceptions;
 using MLAPI.Transports.Tasks;
 using MLAPI.Messaging.Buffering;
+using System.Threading.Tasks;
 
 namespace MLAPI
 {
@@ -535,7 +536,7 @@ namespace MLAPI
         /// <summary>
         /// Starts a Host
         /// </summary>
-        public SocketTasks StartHost(Vector3? position = null, Quaternion? rotation = null, bool? createPlayerObject = null, ulong? prefabHash = null, Stream payloadStream = null)
+        public async Task<SocketTasks> StartHost(Vector3? position = null, Quaternion? rotation = null, bool? createPlayerObject = null, ulong? prefabHash = null, Stream payloadStream = null)
         {
             if (NetworkLog.CurrentLogLevel <= LogLevel.Developer) NetworkLog.LogInfo("StartHost()");
 
@@ -572,7 +573,7 @@ namespace MLAPI
 
             if ((createPlayerObject == null && NetworkConfig.CreatePlayerPrefab) || (createPlayerObject != null && createPlayerObject.Value))
             {
-                NetworkedObject netObject = SpawnManager.CreateLocalNetworkedObject(false, 0, (prefabHash == null ? NetworkConfig.PlayerPrefabHash.Value : prefabHash.Value), null, position, rotation);
+                NetworkedObject netObject = await SpawnManager.CreateLocalNetworkedObject(false, 0, (prefabHash == null ? NetworkConfig.PlayerPrefabHash.Value : prefabHash.Value), null, position, rotation);
                 SpawnManager.SpawnNetworkedObjectLocally(netObject, SpawnManager.GetNetworkObjectId(), false, true, hostClientId, payloadStream, payloadStream != null, payloadStream == null ? 0 : (int)payloadStream.Length, false, false);
 
                 if (netObject.CheckObjectVisibility == null || netObject.CheckObjectVisibility(hostClientId))
@@ -1176,7 +1177,7 @@ namespace MLAPI
 
         private readonly List<NetworkedObject> _observedObjects = new List<NetworkedObject>();
 
-        internal void HandleApproval(ulong clientId, bool createPlayerObject, ulong? playerPrefabHash, bool approved, Vector3? position, Quaternion? rotation)
+        internal async void HandleApproval(ulong clientId, bool createPlayerObject, ulong? playerPrefabHash, bool approved, Vector3? position, Quaternion? rotation)
         {
             if (approved)
             {
@@ -1200,7 +1201,7 @@ namespace MLAPI
 
                 if (createPlayerObject)
                 {
-                    NetworkedObject netObject = SpawnManager.CreateLocalNetworkedObject(false, 0, (playerPrefabHash == null ? NetworkConfig.PlayerPrefabHash.Value : playerPrefabHash.Value), null, position, rotation);
+                    NetworkedObject netObject = await SpawnManager.CreateLocalNetworkedObject(false, 0, (playerPrefabHash == null ? NetworkConfig.PlayerPrefabHash.Value : playerPrefabHash.Value), null, position, rotation);
                     SpawnManager.SpawnNetworkedObjectLocally(netObject, SpawnManager.GetNetworkObjectId(), false, true, clientId, null, false, 0, false, false);
 
                     ConnectedClients[clientId].PlayerObject = netObject;

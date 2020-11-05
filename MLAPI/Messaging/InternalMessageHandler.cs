@@ -223,7 +223,7 @@ namespace MLAPI.Messaging
                 NetworkingManager.Singleton.ConnectedClients.Add(NetworkingManager.Singleton.LocalClientId, new NetworkedClient() { ClientId = NetworkingManager.Singleton.LocalClientId });
 
 
-                void DelayedSpawnAction(Stream continuationStream)
+                async void DelayedSpawnAction(Stream continuationStream)
                 {
                     using (PooledBitReader continuationReader = PooledBitReader.Get(continuationStream))
                     {
@@ -284,7 +284,7 @@ namespace MLAPI.Messaging
                                 rot = Quaternion.Euler(continuationReader.ReadSinglePacked(), continuationReader.ReadSinglePacked(), continuationReader.ReadSinglePacked());
                             }
 
-                            NetworkedObject netObject = SpawnManager.CreateLocalNetworkedObject(softSync, instanceId, prefabHash, parentNetworkId, pos, rot);
+                            NetworkedObject netObject = await SpawnManager.CreateLocalNetworkedObject(softSync, instanceId, prefabHash, parentNetworkId, pos, rot);
                             SpawnManager.SpawnNetworkedObjectLocally(netObject, networkId, softSync, isPlayerObject, ownerId, continuationStream, false, 0, true, false);
 
                             Queue<BufferManager.BufferedMessage> bufferQueue = BufferManager.ConsumeBuffersForNetworkId(networkId);
@@ -354,7 +354,7 @@ namespace MLAPI.Messaging
             }
         }
 
-        internal static void HandleAddObject(ulong clientId, Stream stream)
+        internal static async void HandleAddObject(ulong clientId, Stream stream)
         {
             using (PooledBitReader reader = PooledBitReader.Get(stream))
             {
@@ -406,7 +406,7 @@ namespace MLAPI.Messaging
                 bool hasPayload = reader.ReadBool();
                 int payLoadLength = hasPayload ? reader.ReadInt32Packed() : 0;
 
-                NetworkedObject netObject = SpawnManager.CreateLocalNetworkedObject(softSync, instanceId, prefabHash, parentNetworkId, pos, rot);
+                NetworkedObject netObject = await SpawnManager.CreateLocalNetworkedObject(softSync, instanceId, prefabHash, parentNetworkId, pos, rot);
                 SpawnManager.SpawnNetworkedObjectLocally(netObject, networkId, softSync, isPlayerObject, ownerId, stream, hasPayload, payLoadLength, true, false);
 
                 Queue<BufferManager.BufferedMessage> bufferQueue = BufferManager.ConsumeBuffersForNetworkId(networkId);

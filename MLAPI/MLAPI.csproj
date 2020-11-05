@@ -6,7 +6,9 @@
     <AssemblyTitle>MLAPI</AssemblyTitle>
     <Product>MLAPI</Product>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <TargetFrameworks>net35;net471;net45;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>net471;net45;netstandard2.0</TargetFrameworks>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <OutputType>Library</OutputType>
   </PropertyGroup>
 
   <ItemGroup>

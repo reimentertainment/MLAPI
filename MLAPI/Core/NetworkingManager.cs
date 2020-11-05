@@ -261,8 +261,8 @@ namespace MLAPI
 
             if (!NetworkConfig.RegisteredScenes.Contains(SceneManager.GetActiveScene().name))
             {
-                if (NetworkLog.CurrentLogLevel <= LogLevel.Normal) NetworkLog.LogWarning("The active scene is not registered as a networked scene. The MLAPI has added it");
-                NetworkConfig.RegisteredScenes.Add(SceneManager.GetActiveScene().name);
+                //if (NetworkLog.CurrentLogLevel <= LogLevel.Normal) NetworkLog.LogWarning("The active scene is not registered as a networked scene. The MLAPI has added it");
+                //NetworkConfig.RegisteredScenes.Add(SceneManager.GetActiveScene().name);
             }
 
             for (int i = 0; i < NetworkConfig.NetworkedPrefabs.Count; i++)

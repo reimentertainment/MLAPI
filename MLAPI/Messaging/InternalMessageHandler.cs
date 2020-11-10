@@ -16,6 +16,7 @@ using UnityEngine.Events;
 using UnityEngine.SceneManagement;
 using System.Collections.Generic;
 using MLAPI.Messaging.Buffering;
+using System.Threading.Tasks;
 
 namespace MLAPI.Messaging
 {
@@ -223,7 +224,7 @@ namespace MLAPI.Messaging
                 NetworkingManager.Singleton.ConnectedClients.Add(NetworkingManager.Singleton.LocalClientId, new NetworkedClient() { ClientId = NetworkingManager.Singleton.LocalClientId });
 
 
-                async void DelayedSpawnAction(Stream continuationStream)
+                async Task DelayedSpawnAction(Stream continuationStream)
                 {
                     using (PooledBitReader continuationReader = PooledBitReader.Get(continuationStream))
                     {
@@ -349,7 +350,11 @@ namespace MLAPI.Messaging
                 }
                 else
                 {
-                    DelayedSpawnAction(stream);
+                    Serialization.BitStream continuationStream = new Serialization.BitStream();
+                    continuationStream.CopyUnreadFrom(stream);
+                    continuationStream.Position = 0;
+
+                    DelayedSpawnAction(continuationStream);
                 }
             }
         }

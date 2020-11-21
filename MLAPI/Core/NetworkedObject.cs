@@ -618,6 +618,11 @@ namespace MLAPI
 
         public void SpawnServerOnly(Stream spawnPayload = null, bool destroyWithScene = false)
         {
+            SpawnServerOnlyInternal(spawnPayload, destroyWithScene, null);
+        }
+
+        private void SpawnServerOnlyInternal(Stream spawnPayload = null, bool destroyWithScene = false, ulong? ownerId = null)
+        {
             if (!NetworkingManager.Singleton.IsListening)
             {
                 throw new NotListeningException("NetworkingManager isn't listening, start a server, client or host before spawning objects.");
@@ -626,7 +631,7 @@ namespace MLAPI
             if (spawnPayload != null)
                 spawnPayload.Position = 0;
 
-            SpawnManager.SpawnNetworkedObjectLocally(this, SpawnManager.GetNetworkObjectId(), false, false, null, spawnPayload, spawnPayload != null, spawnPayload == null ? 0 : (int)spawnPayload.Length, false, destroyWithScene);
+            SpawnManager.SpawnNetworkedObjectLocally(this, SpawnManager.GetNetworkObjectId(), false, false, ownerId, spawnPayload, spawnPayload != null, spawnPayload == null ? 0 : (int)spawnPayload.Length, false, destroyWithScene);
 
             /*for (int i = 0; i < NetworkingManager.Singleton.ConnectedClientsList.Count; i++)
             {
@@ -635,6 +640,11 @@ namespace MLAPI
                     SpawnManager.SendSpawnCallForObject(NetworkingManager.Singleton.ConnectedClientsList[i].ClientId, this, spawnPayload);
                 }
             }*/
+        }
+
+        public void SpawnServerOnlyWithOwnership(ulong ownerId, Stream spawnPayload = null, bool destroyWithScene = false)
+        {
+            SpawnServerOnlyInternal(spawnPayload, destroyWithScene, ownerId);
         }
 
         public void Link(ulong networkId)

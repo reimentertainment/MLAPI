@@ -2,7 +2,7 @@
   <Import Project="../common.props" />
   <PropertyGroup>
     <RootNamespace>MLAPI_Tests</RootNamespace>
-    <TargetFrameworks>net35;net471;net45;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>net471;net45;netstandard2.0</TargetFrameworks>
     <LangVersion>7</LangVersion>
   </PropertyGroup>
   <ItemGroup>

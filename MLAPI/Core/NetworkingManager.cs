@@ -138,6 +138,12 @@ namespace MLAPI
         /// Gets Whether or not we are listening for connections
         /// </summary>
         public bool IsListening { get; internal set; }
+
+        /// <summary>
+        /// Used to pause message polling. MLAPI will not receive any RPC's, Custom Messages, etc. while this is 'true'.
+        /// </summary>
+        public bool IsPollingPaused { get; set; } = false;
+
         /// <summary>
         /// Gets if we are connected as a client
         /// </summary>
@@ -637,7 +643,7 @@ namespace MLAPI
         private float lastTimeSyncTime;
         private void Update()
         {
-            if (IsListening)
+            if (IsListening && !IsPollingPaused)
             {
                 if ((NetworkTime - lastReceiveTickTime >= (1f / NetworkConfig.ReceiveTickrate)) || NetworkConfig.ReceiveTickrate <= 0)
                 {

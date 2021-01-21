@@ -7,6 +7,7 @@ using MLAPI.Exceptions;
 using MLAPI.Hashing;
 using MLAPI.Logging;
 using MLAPI.Messaging;
+using MLAPI.Messaging.Buffering;
 using MLAPI.Security;
 using MLAPI.Serialization.Pooled;
 using MLAPI.Spawning;
@@ -655,6 +656,19 @@ namespace MLAPI
 
             /*if (NetworkingManager.Singleton.IsServer)
                 SpawnManager.SpawnedObjects[NetworkId] = this;*/
+
+            Queue<BufferManager.BufferedMessage> bufferQueue = BufferManager.ConsumeBuffersForNetworkId(networkId);
+
+            // Apply buffered messages
+            if (bufferQueue != null) {
+                while (bufferQueue.Count > 0) {
+                    BufferManager.BufferedMessage message = bufferQueue.Dequeue();
+
+                    NetworkingManager.Singleton.HandleIncomingData(message.sender, message.channelName, new ArraySegment<byte>(message.payload.GetBuffer(), (int)message.payload.Position, (int)message.payload.Length), message.receiveTime, false);
+
+                    BufferManager.RecycleConsumedBufferedMessage(message);
+                }
+            }
         }
     }
 }

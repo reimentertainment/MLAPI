@@ -339,7 +339,7 @@ namespace MLAPI.Messaging
                     {
                         SceneManager.activeSceneChanged -= onSceneLoaded;
                         NetworkSceneManager.isSpawnedObjectsPendingInDontDestroyOnLoad = false;
-                        DelayedSpawnAction(continuationStream);
+                        DelayedSpawnAction(continuationStream).ContinueWith(t => Debug.LogException(t.Exception), TaskContinuationOptions.OnlyOnFaulted);
                     }
 
                     onSceneLoaded = (oldScene, newScene) => { OnSceneLoadComplete(); };
@@ -354,7 +354,7 @@ namespace MLAPI.Messaging
                     continuationStream.CopyUnreadFrom(stream);
                     continuationStream.Position = 0;
 
-                    DelayedSpawnAction(continuationStream);
+                    DelayedSpawnAction(continuationStream).ContinueWith(t => Debug.LogException(t.Exception), TaskContinuationOptions.OnlyOnFaulted);
                 }
             }
         }

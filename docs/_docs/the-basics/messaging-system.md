@@ -35,7 +35,7 @@ public class Example : NetworkedBehaviour
           }
           else
           {
-              InvokeServerRpc(MyServerRpc, Random.Range(-50, 50));
+              InvokeServerRpc(MyServerRPC, Random.Range(-50, 50));
           }
       }
   }
@@ -110,7 +110,7 @@ private void OnGUI()
                 {
                     writer.WriteInt32Packed(Random.Range(-50, 50));
 
-                    InvokeServerRpcPerformance(MyServerRpc, stream);
+                    InvokeServerRpcPerformance(MyServerRPC, stream);
                 }
             }
         }
